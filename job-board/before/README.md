@@ -16,7 +16,7 @@ Inside the repo you will notice 2 folders. The `api` folder is handled by our ba
 
 The other folder is the `client` folder which is where you will be spending most of your time. Our application is built using React with Vite and our styles are handled by TailwindCSS. We also use a few other libraries such as React Router, React Hook Form, and Zod. I will explain more in depth how each of these libraries work in our overall application as we get to the code that uses them.
 
-For now to get started all you should need to do is run `npm run dev`. You will see that our application only has a few pages right now. The main page is the task board which shows all of a users tasks. These tasks are stored in local storage since we didn't want to have to deal with user accounts when we started this application. These tasks can be edited/deleted by clicking on the triple dots on the right of each task row. New tasks can also be created with the new task button in the top right corner of the page. Overall these pages are not too complex, but we have a lot of code behind the scenes that will make it easier to add new features.
+For now to get started all you should need to do is copy the `.env` file into `.env.local` file and run `npm run dev`. You will see that our application only has a few pages right now. The main page is the task board which shows all of a users tasks. These tasks are stored in local storage since we didn't want to have to deal with user accounts when we started this application. These tasks can be edited/deleted by clicking on the triple dots on the right of each task row. New tasks can also be created with the new task button in the top right corner of the page. Overall these pages are not too complex, but we have a lot of code behind the scenes that will make it easier to add new features.
 
 When you open up the code you will see a bunch of config files in the root of the `client` folder. You can pretty much ignore these. The only file you will need to modify is the `.env` file to integrate things like API connections and Stripe. Also, there are a few import aliases you can use. `@/<folder>` will import from the `src` folder. This means if you wrote `@/components/ui/Button` it would import the `Button` component from the `ui` folder inside the `components` folder. The other import is the `@backend/<folder>` import. This will import from the `api/src` folder and is mainly used for importing types and schemas from the backend. This means if you wrote `@backend/constants/types` it would import the `types` file from the `api/src/constants` folder.
 
@@ -54,7 +54,15 @@ This folder contains any global utilities we have. If a utility is only used in 
 
 ## Backend Lead Introduction
 
-Hey. I am the backend lead for this project. You shouldn't have to mess much with the backend, but I wanted to give you a quick overview of how things work. We use a library called `Prisma` to handle our database connections. You shouldn't really need to interact with it at all. As long as you have Sqlite installed on your machine you should be able to run `npm run dev` and the dev server should just start right up.
+Hey. I am the backend lead for this project. You shouldn't have to mess much with the backend, but I wanted to give you a quick overview of how things work. We use a library called `Prisma` to handle our database connections. You shouldn't really need to interact with it at all.
+
+To get the backend setup you will need to do the following:
+
+1. Install Sqlite on your machine
+2. Run `npm i`
+3. Copy the `.env.example` file to `.env`
+4. Run `npx prisma db push`
+5. Run `npm run dev`
 
 Now I know you don't really care about the backend, but there are a few folders/files that you may need to use on the client.
 
