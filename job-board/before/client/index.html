@@ -6,13 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Task Board</title>
     <script>
-      let theme = JSON.parse(localStorage.getItem("THEME"))
-
-      if (theme !== "dark" && theme !== "light") {
-        theme = window.matchMedia("(prefers-color-scheme: dark)").matches
-          ? "dark"
-          : "light"
-      }
+      const theme = window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light"
 
       document.documentElement.classList.toggle("dark", theme === "dark")
     </script>

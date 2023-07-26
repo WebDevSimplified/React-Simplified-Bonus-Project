@@ -7,7 +7,7 @@ type JobListingGridProps = {
 export function JobListingGrid({ children }: JobListingGridProps) {
   return (
     <>
-      <div className="flex flex-col sm:grid gap-4 grid-cols-[repeat(auto-fill,minmax(400px,1fr))] mt-12">
+      <div className="flex flex-col sm:grid gap-4 grid-cols-[repeat(auto-fill,minmax(400px,1fr))]">
         {children}
       </div>
     </>

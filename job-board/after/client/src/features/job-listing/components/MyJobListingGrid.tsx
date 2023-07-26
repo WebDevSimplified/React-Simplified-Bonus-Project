@@ -63,9 +63,12 @@ export function MyJobListingGrid({ jobListings }: JobListingGridProps) {
   )
 
   const visibleJobListings = useMemo(() => {
-    return jobListings
-      .filter(jobListing => !deletedJobListingIds.includes(jobListing.id))
-      .sort(sortJobListings)
+    return (
+      jobListings
+        .filter(jobListing => !deletedJobListingIds.includes(jobListing.id))
+        // TODO: Sort in the video on payment
+        .sort(sortJobListings)
+    )
   }, [jobListings, deletedJobListingIds])
 
   function deleteListing(id: string) {

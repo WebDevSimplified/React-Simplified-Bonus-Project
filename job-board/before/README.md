@@ -93,7 +93,7 @@ Overall the API is broken down into 3 main routes which will each help you tackl
 
 #### Stripe Routes
 
-1. `POST /stripe/webhook/job-listing-order-complete` - This is not a route that you will need to directly call. Stripe will call this route for us whenever a payment is successfully made and it will update the job listing with the new expiration date. Our dev ops team will set up this webhook in production, but to test this webhook locally you will need to use Stripe's CLI. I will explain more about that in the next section.
+1. `POST /stripe-webhooks/job-listing-order-complete` - This is not a route that you will need to directly call. Stripe will call this route for us whenever a payment is successfully made and it will update the job listing with the new expiration date. Our dev ops team will set up this webhook in production, but to test this webhook locally you will need to use Stripe's CLI. I will explain more about that in the next section.
 
 ### Stripe Setup
 
@@ -107,7 +107,7 @@ For our particular use case you will want to run the following commands to test 
 
 ```bash
 stripe login
-stripe listen --forward-to localhost:3000/api/stripe/webhook/job-listing-order-complete
+stripe listen --forward-to localhost:3000/stripe-webhooks/job-listing-order-complete
 ```
 
 Just replace `stripe` with the correct version of the CLI you are using. For example, if you are one a Mac you should use `stripeMac` instead of `stripe`. If you download and use the CLI directly from Stripe's site you should be able to just use `stripe` as the command.
