@@ -1,17 +1,21 @@
-import { z } from "zod"
-import { Control, FieldValues, Path, PathValue, useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
 import {
+  Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-  Form,
-  FormDescription,
 } from "@/components/ui/form"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Control, FieldValues, Path, PathValue, useForm } from "react-hook-form"
+import { z } from "zod"
+import { jobListingFormSchema } from "@backend/constants/schemas/jobListings"
+
+import { Button } from "@/components/ui/button"
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner"
+import { Textarea } from "@/components/ui/textarea"
 import {
   Select,
   SelectContent,
@@ -20,42 +24,39 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
 import {
   JOB_LISTING_EXPERIENCE_LEVELS,
   JOB_LISTING_TYPES,
 } from "@backend/constants/types"
-import { jobListingFormSchema } from "@backend/constants/schemas/jobListings"
 import { useState } from "react"
+import { JobListingGrid } from "./JobListingGrid"
 import { JobListingCard } from "./JobListingCard"
 import { JobListingFullDialog } from "./JobListingFullDialog"
-import { LoadingSpinner } from "@/components/ui/LoadingSpinner"
-import { JobListingGrid } from ".."
 
-type JobListingFormValues = z.infer<typeof jobListingFormSchema>
+type JobListingValues = z.infer<typeof jobListingFormSchema>
 
-type JobListingFormProps = {
-  initialJobListing?: JobListingFormValues
-  onSubmit: (task: JobListingFormValues) => void
-}
-
-const DEFAULT_VALUES: JobListingFormValues = {
-  title: "",
+const DEFAULT_VALUES: JobListingValues = {
+  applyUrl: "",
   companyName: "",
+  description: "",
+  experienceLevel: "Mid-Level",
   location: "",
   salary: NaN,
-  type: "Full Time",
-  experienceLevel: "Mid-Level",
   shortDescription: "",
-  description: "",
-  applyUrl: "",
+  title: "",
+  type: "Full Time",
+}
+
+type JobListingFormProps = {
+  onSubmit: (values: JobListingValues) => void
+  initialJobListing?: JobListingValues
 }
 
 export function JobListingForm({
-  initialJobListing = DEFAULT_VALUES,
   onSubmit,
+  initialJobListing = DEFAULT_VALUES,
 }: JobListingFormProps) {
-  const form = useForm<JobListingFormValues>({
+  const form = useForm<JobListingValues>({
     resolver: zodResolver(jobListingFormSchema),
     defaultValues: initialJobListing,
   })
@@ -71,7 +72,7 @@ export function JobListingForm({
               control={form.control}
               name="title"
               render={({ field }) => (
-                <FormItem className="sm:col-span-2 lg:col-span-1">
+                <FormItem>
                   <FormLabel>Title</FormLabel>
                   <FormControl>
                     <Input {...field} />
@@ -120,16 +121,16 @@ export function JobListingForm({
               )}
             />
             <JobListingSelectFormField
-              control={form.control}
-              name="type"
               label="Type"
               options={JOB_LISTING_TYPES}
+              control={form.control}
+              name="type"
             />
             <JobListingSelectFormField
-              control={form.control}
-              name="experienceLevel"
               label="Experience Level"
               options={JOB_LISTING_EXPERIENCE_LEVELS}
+              control={form.control}
+              name="experienceLevel"
             />
             <FormField
               control={form.control}
@@ -145,7 +146,6 @@ export function JobListingForm({
                       value={isNaN(field.value) ? "" : field.value}
                     />
                   </FormControl>
-                  <FormDescription>In USD</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -181,15 +181,15 @@ export function JobListingForm({
           </div>
           <div className="flex gap-2 justify-end">
             <Button
-              type="button"
               variant="outline"
+              type="button"
               onClick={() => setIsPreviewOpen(p => !p)}
             >
-              {isPreviewOpen ? "Hide" : "Show"} Preview
+              {isPreviewOpen ? "Close" : "Show"} Preview
             </Button>
             <Button
               type="submit"
-              disabled={form.formState.isSubmitting || !form.formState.isValid}
+              disabled={!form.formState.isValid || form.formState.isSubmitting}
             >
               {form.formState.isSubmitting ? <LoadingSpinner /> : "Save"}
             </Button>
@@ -197,7 +197,7 @@ export function JobListingForm({
         </form>
       </Form>
       {isPreviewOpen && (
-        <JobListingGrid>
+        <JobListingGrid className="mt-12">
           <JobListingCard
             {...jobListingValues}
             footerBtns={<JobListingFullDialog {...jobListingValues} />}
@@ -230,7 +230,7 @@ function JobListingSelectFormField<T extends FieldValues>({
           <FormLabel>{label}</FormLabel>
           <Select
             onValueChange={val => field.onChange(val as PathValue<T, Path<T>>)}
-            defaultValue={field.value}
+            value={field.value}
           >
             <FormControl>
               <SelectTrigger>

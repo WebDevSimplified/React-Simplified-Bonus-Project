@@ -1,26 +1,24 @@
 import { PageHeader } from "@/components/ui/PageHeader"
 import { JobListingForm, editJobListing } from "@/features/job-listing"
-import { useNavigate } from "react-router-dom"
 import { Await, useDeferredLoaderData } from "@/lib/reactRouter"
+import { useNavigate } from "react-router-dom"
+import { loader } from "./loader"
 import { Suspense } from "react"
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner"
-import { loader } from "./loader"
 
 export function EditJobListingPage() {
   const navigate = useNavigate()
-  const data = useDeferredLoaderData<typeof loader>()
-  const { id } = data
-
+  const { id, jobListingPromise } = useDeferredLoaderData<typeof loader>()
   return (
     <>
       <PageHeader>Edit Listing</PageHeader>
-      <Suspense fallback={<LoadingSpinner className="h-24 w-24" />}>
-        <Await resolve={data.jobListing}>
+      <Suspense fallback={<LoadingSpinner className="w-24 h-24" />}>
+        <Await resolve={jobListingPromise}>
           {jobListing => (
             <JobListingForm
               initialJobListing={jobListing}
-              onSubmit={async data => {
-                await editJobListing(id, data)
+              onSubmit={async values => {
+                await editJobListing(id, values)
                 navigate("/jobs/my-listings")
               }}
             />

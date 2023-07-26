@@ -1,15 +1,16 @@
-import { ReactNode } from "react"
+import { cn } from "@/utils/shadcnUtils"
+import { ComponentProps } from "react"
 
-type JobListingGridProps = {
-  children: ReactNode
-}
+type JobListingGridProps = ComponentProps<"div">
 
-export function JobListingGrid({ children }: JobListingGridProps) {
+export function JobListingGrid({ className, ...props }: JobListingGridProps) {
   return (
-    <>
-      <div className="flex flex-col sm:grid gap-4 grid-cols-[repeat(auto-fill,minmax(400px,1fr))]">
-        {children}
-      </div>
-    </>
+    <div
+      {...props}
+      className={cn(
+        "flex flex-col sm:grid gap-4 grid-cols-[repeat(auto-fill,minmax(400px,1fr))]",
+        className
+      )}
+    ></div>
   )
 }

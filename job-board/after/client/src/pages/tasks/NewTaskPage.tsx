@@ -1,5 +1,5 @@
 import { PageHeader } from "@/components/ui/PageHeader"
-import { TaskForm, addTask } from "@/features/todo-list"
+import { TaskForm, addTask } from "@/features/task-list"
 import { useNavigate } from "react-router-dom"
 
 export function NewTaskPage() {

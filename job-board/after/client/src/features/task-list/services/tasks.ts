@@ -1,4 +1,4 @@
-import { Task } from "../data/types"
+import { Task } from "../constants/types"
 
 const LOCAL_STORAGE_KEY = "tasks"
 

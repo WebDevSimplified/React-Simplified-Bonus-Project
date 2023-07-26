@@ -1,18 +1,22 @@
-import { createContext, useEffect, useState } from "react"
+import { ReactNode, createContext, useEffect, useState } from "react"
 import { User } from "../constants/types"
 import {
-  getLoggedInUser,
+  signup as signupService,
   login as loginService,
   logout as logoutService,
-  signup as signupService,
+  getLoggedInUser,
 } from "../services/authentication"
 import { useLocation, useNavigate } from "react-router-dom"
 import { LogoutDialog } from "../components/LogoutDialog"
 
+type AuthProviderProps = {
+  children: ReactNode
+}
+
 type AuthContext = {
   login: (email: string, password: string) => Promise<void>
   signup: (email: string, password: string) => Promise<void>
-  logout: () => void
+  logout: () => Promise<void>
   isLoggedIn: boolean
   isLoadingUser: boolean
   user?: User
@@ -20,29 +24,21 @@ type AuthContext = {
 
 export const Context = createContext<AuthContext | null>(null)
 
-type AuthProvider = {
-  children: React.ReactNode
-}
-
-export function AuthProvider({ children }: AuthProvider) {
+export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User>()
   const [isLoadingUser, setIsLoadingUser] = useState(true)
-  const [isLogOutModalOpen, setIsLogOutModalOpen] = useState(false)
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false)
   const navigate = useNavigate()
   const location = useLocation()
 
   useEffect(() => {
+    setIsLoadingUser(true)
     getLoggedInUser()
       .then(setUser)
-      .finally(() => setIsLoadingUser(false))
+      .finally(() => {
+        setIsLoadingUser(false)
+      })
   }, [])
-
-  function login(email: string, password: string) {
-    return loginService(email, password).then(user => {
-      setUser(user)
-      navigate(location.state?.location ?? "/")
-    })
-  }
 
   function signup(email: string, password: string) {
     return signupService(email, password).then(user => {
@@ -51,11 +47,20 @@ export function AuthProvider({ children }: AuthProvider) {
     })
   }
 
+  function login(email: string, password: string) {
+    return loginService(email, password).then(user => {
+      setUser(user)
+      navigate(location.state?.location ?? "/")
+    })
+  }
+
   function logout() {
-    setIsLogOutModalOpen(true)
+    setIsLogoutModalOpen(true)
     return logoutService()
-      .then(() => setUser(undefined))
-      .finally(() => setIsLogOutModalOpen(false))
+      .then(() => {
+        setUser(undefined)
+      })
+      .finally(() => setIsLogoutModalOpen(false))
   }
 
   return (
@@ -63,16 +68,16 @@ export function AuthProvider({ children }: AuthProvider) {
       value={{
         user,
         isLoadingUser,
-        login,
         signup,
         logout,
+        login,
         isLoggedIn: user != null,
       }}
     >
       {children}
       <LogoutDialog
-        isOpen={isLogOutModalOpen}
-        onOpenChange={setIsLogOutModalOpen}
+        isOpen={isLogoutModalOpen}
+        onOpenChange={setIsLogoutModalOpen}
       />
     </Context.Provider>
   )

@@ -1,3 +1,4 @@
+import { Badge } from "@/components/ui/badge"
 import {
   Card,
   CardContent,
@@ -6,38 +7,38 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { Banknote, CalendarDays, GraduationCap } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
-import { JobListing } from ".."
 import { formatCurrency } from "@/utils/formatters"
 import { cn } from "@/utils/shadcnUtils"
+import { Banknote, CalendarDays, GraduationCap } from "lucide-react"
+import { ReactNode } from "react"
+import { JobListing } from "../constants/types"
 
 type JobListingCardProps = {
   className?: string
-  headerDetails?: React.ReactNode
-  footerBtns?: React.ReactNode
+  headerDetails?: ReactNode
+  footerBtns?: ReactNode
 } & Pick<
   JobListing,
   | "title"
   | "companyName"
   | "experienceLevel"
-  | "location"
-  | "salary"
   | "shortDescription"
+  | "salary"
+  | "location"
   | "type"
 >
 
 export function JobListingCard({
   className,
-  headerDetails,
-  footerBtns,
   title,
   companyName,
-  experienceLevel,
   location,
+  headerDetails,
   salary,
-  shortDescription,
   type: jobType,
+  experienceLevel,
+  shortDescription,
+  footerBtns,
 }: JobListingCardProps) {
   return (
     <Card className={cn("h-full flex flex-col", className)}>
@@ -53,17 +54,12 @@ export function JobListingCard({
           {headerDetails}
         </div>
         <div className="flex gap-1 flex-wrap">
-          {/* Salary */}
           <Badge variant="secondary" className="flex gap-1 whitespace-nowrap">
             <Banknote className="w-4 h-4" /> {formatCurrency(salary)}
           </Badge>
-
-          {/* Job Type (full time, part time, internship) (Maybe can be multiple) */}
           <Badge variant="secondary" className="flex gap-1 whitespace-nowrap">
             <CalendarDays className="w-4 h-4" /> {jobType}
           </Badge>
-
-          {/* Experience level (junior, mid level, senior) */}
           <Badge variant="secondary" className="flex gap-1 whitespace-nowrap">
             <GraduationCap className="w-4 h-4" /> {experienceLevel}
           </Badge>

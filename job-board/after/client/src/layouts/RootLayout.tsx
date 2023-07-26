@@ -1,8 +1,8 @@
 import { Toaster } from "@/components/ui/toaster"
-import { ThemeProvider } from "@/contexts/ThemeProvider"
-import { AuthProvider } from "@/features/authentication"
 import { Outlet, ScrollRestoration } from "react-router-dom"
 import { Navbar } from "./Navbar"
+import { ThemeProvider } from "@/contexts/ThemeProvider"
+import { AuthProvider } from "@/features/authentication"
 
 export function RootLayout() {
   return (

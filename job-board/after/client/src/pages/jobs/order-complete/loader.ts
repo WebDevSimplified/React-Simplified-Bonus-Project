@@ -6,7 +6,7 @@ export const loader = deferredLoader(({ request: { url } }) => {
   const clientSecret = searchParams.get("payment_intent_client_secret")
 
   return {
-    message: stripePromise.then(stripe => {
+    messagePromise: stripePromise.then(stripe => {
       if (stripe == null || clientSecret == null) {
         return "Something went wrong"
       }
@@ -24,9 +24,6 @@ export const loader = deferredLoader(({ request: { url } }) => {
             default:
               return "Something went wrong"
           }
-        })
-        .catch(() => {
-          return "Something went wrong"
         })
     }),
   }

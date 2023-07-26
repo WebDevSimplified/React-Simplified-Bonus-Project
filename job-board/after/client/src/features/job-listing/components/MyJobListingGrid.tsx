@@ -1,10 +1,8 @@
+import { Link } from "react-router-dom"
 import { JobListing } from "../constants/types"
 import { JobListingCard } from "./JobListingCard"
+import { JobListingGrid } from "./JobListingGrid"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { differenceInDays, formatDistanceStrict, isAfter } from "date-fns"
-import { assertUnreachable } from "@backend/utils/assertUnreachable"
-import { getJobListingPriceInCents } from "@backend/utils/getJobListingPriceInCents"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,220 +15,181 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import {
+  createPublishPaymentIntent,
+  deleteListing,
+} from "../services/jobListing"
+import { useMemo, useState } from "react"
+import { toast } from "@/components/ui/use-toast"
+import { ToastAction } from "@/components/ui/toast"
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { formatCurrency } from "@/utils/formatters"
 import { JOB_LISTING_DURATIONS } from "@backend/constants/types"
+import { formatCurrency } from "@/utils/formatters"
+import { getJobListingPriceInCents } from "@backend/utils/getJobListingPriceInCents"
 import {
   Dialog,
-  DialogHeader,
   DialogContent,
-  DialogTrigger,
-  DialogTitle,
   DialogDescription,
+  DialogTitle,
 } from "@/components/ui/dialog"
-import { useMemo, useState } from "react"
-import {
-  createPublishPaymentIntent,
-  deleteJobListing,
-} from "../services/jobListings"
-import { Skeleton } from "@/components/ui/skeleton"
+import { differenceInDays, formatDistanceStrict, isAfter } from "date-fns"
+import { Badge } from "@/components/ui/badge"
 import { Elements } from "@stripe/react-stripe-js"
 import { stripePromise } from "@/lib/stripe"
 import { JobListingCheckoutForm } from "./JobListingCheckoutForm"
 import { useTheme } from "@/hooks/useTheme"
-import { toast } from "@/components/ui/use-toast"
-import { ToastAction } from "@/components/ui/toast"
-import { Link } from "react-router-dom"
 
-type JobListingGridProps = {
+type MyJobListingGridProps = {
   jobListings: JobListing[]
 }
 
-export function MyJobListingGrid({ jobListings }: JobListingGridProps) {
-  const { isDark } = useTheme()
-  const [selectedId, setSelectedId] = useState<string>()
+export function MyJobListingGrid({ jobListings }: MyJobListingGridProps) {
   const [deletedJobListingIds, setDeletedJobListingIds] = useState<string[]>([])
-  const [selectedDuration, setSelectedDuration] =
-    useState<(typeof JOB_LISTING_DURATIONS)[number]>()
-  const [clientSecret, setClientSecret] = useState<string>()
-  const selectedJobListing = useMemo(
-    () => jobListings.find(jobListing => jobListing.id === selectedId),
-    [selectedId, jobListings]
-  )
-
   const visibleJobListings = useMemo(() => {
-    return (
-      jobListings
-        .filter(jobListing => !deletedJobListingIds.includes(jobListing.id))
-        // TODO: Sort in the video on payment
-        .sort(sortJobListings)
-    )
+    return jobListings
+      .filter(jobListing => !deletedJobListingIds.includes(jobListing.id))
+      .sort(sortJobListings)
   }, [jobListings, deletedJobListingIds])
 
-  function deleteListing(id: string) {
-    setDeletedJobListingIds(prev => [...prev, id])
-    deleteJobListing(id).catch(() => {
+  function deleteJobListing(id: string) {
+    deleteListing(id).catch(() => {
       toast({
         title: "Failed to delete job listing",
         action: (
           <ToastAction
-            onClick={() => deleteListing(id)}
             altText="Click the delete button in the job card to retry"
+            onClick={() => deleteJobListing(id)}
           >
             Retry
           </ToastAction>
         ),
       })
-      setDeletedJobListingIds(prev =>
-        prev.filter(listingId => listingId !== id)
-      )
+      setDeletedJobListingIds(ids => {
+        return ids.filter(listingId => listingId !== id)
+      })
     })
+    setDeletedJobListingIds(ids => [...ids, id])
   }
 
   return (
-    <Dialog>
-      <div className="flex flex-col sm:grid gap-4 grid-cols-[repeat(auto-fill,minmax(400px,1fr))]">
-        {visibleJobListings.map(jobListing => (
-          <MyJobListingCard
-            key={jobListing.id}
-            jobListing={jobListing}
-            setClientSecret={setClientSecret}
-            setSelectedDuration={setSelectedDuration}
-            setSelectedId={setSelectedId}
-            deleteListing={deleteListing}
-          />
-        ))}
-      </div>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>
-            {selectedJobListing != null && selectedDuration != null ? (
-              `${getPurchaseButtonText(
-                getJobListingStatus(selectedJobListing.expiresAt)
-              )} ${selectedJobListing.title} for ${selectedDuration} days`
-            ) : (
-              <Skeleton className="h-4 w-[250px]" />
-            )}
-          </DialogTitle>
-          <DialogDescription>
-            This is a non-refundable purchase.
-          </DialogDescription>
-          <div className="pt-4">
-            {clientSecret != null && selectedDuration != null ? (
-              <Elements
-                stripe={stripePromise}
-                options={{
-                  clientSecret,
-                  appearance: { theme: isDark ? "night" : "stripe" },
-                }}
-              >
-                <JobListingCheckoutForm
-                  amount={getJobListingPriceInCents(selectedDuration) / 100}
-                />
-              </Elements>
-            ) : (
-              <>
-                <Skeleton className="h-48" />
-                <Skeleton className="h-8 mt-4" />
-              </>
-            )}
-          </div>
-        </DialogHeader>
-      </DialogContent>
-    </Dialog>
+    <JobListingGrid>
+      {visibleJobListings.map(jobListing => (
+        <MyJobListingCard
+          key={jobListing.id}
+          jobListing={jobListing}
+          deleteJobListing={deleteJobListing}
+        />
+      ))}
+    </JobListingGrid>
   )
 }
-
-type MyJobListingCardProps = {
+type MyJobListingCard = {
   jobListing: JobListing
-  setSelectedId: (id: string) => void
-  setSelectedDuration: (
-    duration: (typeof JOB_LISTING_DURATIONS)[number]
-  ) => void
-  deleteListing: (id: string) => void
-  setClientSecret: (clientSecret: string | undefined) => void
+  deleteJobListing: (id: string) => void
 }
 
-function MyJobListingCard({
-  jobListing,
-  setSelectedId,
-  setSelectedDuration,
-  setClientSecret,
-  deleteListing,
-}: MyJobListingCardProps) {
+function MyJobListingCard({ jobListing, deleteJobListing }: MyJobListingCard) {
+  const [selectedDuration, setSelectedDuration] =
+    useState<(typeof JOB_LISTING_DURATIONS)[number]>()
+  const [clientSecret, setClientSecret] = useState<string>()
   const status = getJobListingStatus(jobListing.expiresAt)
-  const badgeVariant =
-    status === "Active"
-      ? "default"
-      : status === "Expired"
-      ? "destructive"
-      : "secondary"
+  const { isDark } = useTheme()
 
   return (
     <JobListingCard
-      key={jobListing.id}
+      {...jobListing}
       headerDetails={
         <div>
-          <Badge className="rounded" variant={badgeVariant}>
-            {status}{" "}
+          <Badge
+            className="rounded"
+            variant={getJobListingBadgeVariant(status)}
+          >
+            {status}
             {status === "Active" &&
               jobListing.expiresAt != null &&
-              `- ${getDaysRemainingText(jobListing.expiresAt)}`}
+              ` - ${getDaysRemainingText(jobListing.expiresAt)}`}
           </Badge>
         </div>
       }
       footerBtns={
         <>
           <DeleteJobListingDialog
-            deleteListing={() => deleteListing(jobListing.id)}
+            deleteListing={() => deleteJobListing(jobListing.id)}
           />
           <Button variant="outline" asChild>
             <Link to={`/jobs/${jobListing.id}/edit`}>Edit</Link>
           </Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button className="data-[state=open]:bg-slate-700 dark:data-[state=open]:bg-slate-300">
-                {getPurchaseButtonText(status)}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {JOB_LISTING_DURATIONS.map(duration => (
-                <DialogTrigger asChild key={duration}>
+          <Dialog
+            open={selectedDuration != null}
+            onOpenChange={isOpen => {
+              if (isOpen) return
+              setSelectedDuration(undefined)
+              setClientSecret(undefined)
+            }}
+          >
+            <DialogContent>
+              <DialogTitle>
+                {getPurchaseButtonText(status)} {jobListing.title} for{" "}
+                {selectedDuration} days
+              </DialogTitle>
+              <DialogDescription>
+                This is a non-refundable purchase
+              </DialogDescription>
+              {clientSecret != null && selectedDuration != null && (
+                <Elements
+                  options={{
+                    clientSecret,
+                    appearance: { theme: isDark ? "night" : "stripe" },
+                  }}
+                  stripe={stripePromise}
+                >
+                  <JobListingCheckoutForm
+                    amount={getJobListingPriceInCents(selectedDuration) / 100}
+                  />
+                </Elements>
+              )}
+            </DialogContent>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button>{getPurchaseButtonText(status)}</Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {JOB_LISTING_DURATIONS.map(duration => (
                   <DropdownMenuItem
-                    onClick={() => {
-                      setSelectedId(jobListing.id)
+                    onClick={async () => {
                       setSelectedDuration(duration)
-                      setClientSecret(undefined)
-                      createPublishPaymentIntent(jobListing.id, duration).then(
-                        data => {
-                          setClientSecret(data.clientSecret)
-                        }
+                      const { clientSecret } = await createPublishPaymentIntent(
+                        jobListing.id,
+                        duration
                       )
+                      setClientSecret(clientSecret)
                     }}
+                    key={duration}
                   >
                     {duration} Days -{" "}
                     {formatCurrency(getJobListingPriceInCents(duration) / 100)}
                   </DropdownMenuItem>
-                </DialogTrigger>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </Dialog>
         </>
       }
-      {...jobListing}
     />
   )
 }
 
+type DeleteJobListingDialogProps = {
+  deleteListing: () => void
+}
+
 function DeleteJobListingDialog({
   deleteListing,
-}: {
-  deleteListing: () => void
-}) {
+}: DeleteJobListingDialogProps) {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
@@ -257,18 +216,6 @@ function DeleteJobListingDialog({
   )
 }
 
-function sortJobListings(a: JobListing, b: JobListing) {
-  if (a.expiresAt === b.expiresAt) {
-    return 0
-  } else if (a.expiresAt == null) {
-    return -1
-  } else if (b.expiresAt == null) {
-    return 1
-  } else {
-    return differenceInDays(a.expiresAt, b.expiresAt)
-  }
-}
-
 function getJobListingStatus(expiresAt: Date | null) {
   if (expiresAt == null) {
     return "Draft"
@@ -291,7 +238,30 @@ function getPurchaseButtonText(status: ReturnType<typeof getJobListingStatus>) {
       return "Extend"
     case "Expired":
       return "Republish"
-    default:
-      assertUnreachable(status)
+  }
+}
+
+function getJobListingBadgeVariant(
+  status: ReturnType<typeof getJobListingStatus>
+) {
+  switch (status) {
+    case "Draft":
+      return "secondary"
+    case "Active":
+      return "default"
+    case "Expired":
+      return "destructive"
+  }
+}
+
+function sortJobListings(a: JobListing, b: JobListing) {
+  if (a.expiresAt === b.expiresAt) {
+    return 0
+  } else if (a.expiresAt == null) {
+    return -1
+  } else if (b.expiresAt == null) {
+    return 1
+  } else {
+    return differenceInDays(a.expiresAt, b.expiresAt)
   }
 }

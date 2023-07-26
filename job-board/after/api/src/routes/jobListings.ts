@@ -39,7 +39,6 @@ jobListingsRouter.post("/", async (req, res) => {
   const jobListing = await db.jobListing.create({
     data: {
       ...body,
-      postStatus: "draft",
       postedBy: { connect: { id: req.session.user.id } },
     },
   })

@@ -3,7 +3,7 @@ import {
   TASK_CATEGORIES,
   TASK_PRIORITIES,
   TASK_STATUSES,
-} from "../data/constants"
+} from "../constants/constants"
 import { Control, FieldValues, Path, PathValue, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {

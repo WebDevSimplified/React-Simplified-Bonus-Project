@@ -5,5 +5,5 @@ export {
   TASK_PRIORITIES,
   TASK_STATUSES,
   TASK_CATEGORIES,
-} from "./data/constants"
-export type { Task } from "./data/types"
+} from "./constants/constants"
+export type { Task } from "./constants/types"

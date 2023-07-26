@@ -1,18 +1,16 @@
-import { z } from "zod"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
 import {
+  Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-  Form,
 } from "@/components/ui/form"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-
-import { Link } from "react-router-dom"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
+import { signupSchema } from "@backend/constants/schemas/users"
 import {
   Card,
   CardContent,
@@ -21,12 +19,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { AxiosError } from "axios"
-import { useAuth } from ".."
-import { signupSchema } from "@backend/constants/schemas/users"
+import { Button } from "@/components/ui/button"
+import { Link } from "react-router-dom"
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner"
+import { AxiosError } from "axios"
+import { useAuth } from "../hooks/useAuth"
 
-type LoginFormValues = z.infer<typeof formSchema>
+type SignupValues = z.infer<typeof formSchema>
 
 const formSchema = signupSchema
   .merge(z.object({ passwordConfirmation: z.string() }))
@@ -37,12 +36,13 @@ const formSchema = signupSchema
 
 export function SignupForm() {
   const { signup } = useAuth()
-  const form = useForm<LoginFormValues>({
+
+  const form = useForm<SignupValues>({
     resolver: zodResolver(formSchema),
     defaultValues: { email: "", password: "", passwordConfirmation: "" },
   })
 
-  async function onSubmit(values: LoginFormValues) {
+  async function onSubmit(values: SignupValues) {
     await signup(values.email, values.password).catch(error => {
       if (
         error instanceof AxiosError &&
@@ -115,7 +115,7 @@ export function SignupForm() {
             </Button>
             <Button
               type="submit"
-              disabled={form.formState.isSubmitting || !form.formState.isValid}
+              disabled={!form.formState.isValid || form.formState.isSubmitting}
             >
               {form.formState.isSubmitting ? <LoadingSpinner /> : "Sign Up"}
             </Button>

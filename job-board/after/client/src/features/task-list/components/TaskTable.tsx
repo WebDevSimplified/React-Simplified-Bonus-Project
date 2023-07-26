@@ -26,12 +26,12 @@ import {
   User,
 } from "lucide-react"
 import { useMemo } from "react"
-import { Task } from "../data/types"
+import { Task } from "../constants/types"
 import {
   TASK_STATUSES,
   TASK_PRIORITIES,
   TASK_CATEGORIES,
-} from "../data/constants"
+} from "../constants/constants"
 import {
   DialogHeader,
   Dialog,

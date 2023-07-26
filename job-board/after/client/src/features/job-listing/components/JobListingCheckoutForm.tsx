@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { formatCurrency } from "@/utils/formatters"
 import { PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js"
-import { useState } from "react"
+import { FormEvent, useState } from "react"
 
 type JobListingCheckoutFormProps = {
   amount: number
@@ -12,35 +12,34 @@ export function JobListingCheckoutForm({
 }: JobListingCheckoutFormProps) {
   const stripe = useStripe()
   const elements = useElements()
-  const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string>()
+  const [isLoading, setIsLoading] = useState(false)
 
-  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function onSubmit(e: FormEvent) {
     e.preventDefault()
+
     if (stripe == null || elements == null) return
 
     setIsLoading(true)
+    const { error } = await stripe.confirmPayment({
+      elements,
+      confirmParams: {
+        return_url: `${window.location.origin}/jobs/order-complete`,
+      },
+    })
 
-    stripe
-      .confirmPayment({
-        elements,
-        confirmParams: {
-          return_url: `${window.location.origin}/jobs/order-complete`,
-        },
-      })
-      .then(({ error }) => {
-        if (error.type === "card_error" || error.type === "validation_error") {
-          setErrorMessage(error.message)
-        } else {
-          setErrorMessage("An unexpected error occurred")
-        }
-      })
-      .finally(() => setIsLoading(false))
+    if (error.type === "card_error" || error.type === "validation_error") {
+      setErrorMessage(error.message)
+    } else {
+      setErrorMessage("An unexpected error occurred.")
+    }
+
+    setIsLoading(false)
   }
 
   return (
     <form onSubmit={onSubmit}>
-      {errorMessage && (
+      {errorMessage != null && (
         <p className="text-red-500 dark:text-red-900 text-sm mb-4">
           {errorMessage}
         </p>
@@ -48,8 +47,7 @@ export function JobListingCheckoutForm({
       <PaymentElement />
       <Button
         disabled={isLoading || stripe == null || elements == null}
-        type="submit"
-        className="w-full mt-4"
+        className="mt-4 w-full"
       >
         Pay {formatCurrency(amount)}
       </Button>

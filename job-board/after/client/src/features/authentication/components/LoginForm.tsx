@@ -1,18 +1,16 @@
-import { z } from "zod"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
 import {
+  Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-  Form,
 } from "@/components/ui/form"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-
-import { Link, Navigate, useLocation } from "react-router-dom"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
+import { loginSchema } from "@backend/constants/schemas/users"
 import {
   Card,
   CardContent,
@@ -21,26 +19,23 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { AxiosError } from "axios"
-import { useAuth } from ".."
-import { loginSchema } from "@backend/constants/schemas/users"
+import { Button } from "@/components/ui/button"
+import { Link } from "react-router-dom"
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner"
+import { AxiosError } from "axios"
+import { useAuth } from "../hooks/useAuth"
 
-type LoginFormValues = z.infer<typeof loginSchema>
+type LoginValues = z.infer<typeof loginSchema>
 
 export function LoginForm() {
-  const { login, user } = useAuth()
-  const form = useForm<LoginFormValues>({
+  const { login } = useAuth()
+
+  const form = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: { email: "", password: "" },
   })
-  const location = useLocation()
 
-  if (user != null) {
-    return <Navigate to={location.state?.location ?? "/"} replace />
-  }
-
-  async function onSubmit(values: LoginFormValues) {
+  async function onSubmit(values: LoginValues) {
     await login(values.email, values.password).catch(error => {
       if (
         error instanceof AxiosError &&
@@ -96,13 +91,13 @@ export function LoginForm() {
               <Link to="/">Cancel</Link>
             </Button>
             <Button type="button" asChild variant="outline">
-              <Link to="/signup">Sign up</Link>
+              <Link to="/signup">Signup</Link>
             </Button>
             <Button
               type="submit"
-              disabled={form.formState.isSubmitting || !form.formState.isValid}
+              disabled={!form.formState.isValid || form.formState.isSubmitting}
             >
-              {form.formState.isSubmitting ? <LoadingSpinner /> : "Log In"}
+              {form.formState.isSubmitting ? <LoadingSpinner /> : "Login"}
             </Button>
           </CardFooter>
         </Card>

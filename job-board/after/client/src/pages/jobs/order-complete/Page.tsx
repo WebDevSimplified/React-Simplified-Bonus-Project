@@ -1,19 +1,19 @@
-import { PageHeader } from "@/components/ui/PageHeader"
-import { Button } from "@/components/ui/button"
 import { Await, useDeferredLoaderData } from "@/lib/reactRouter"
-import { Suspense } from "react"
-import { Link } from "react-router-dom"
 import { loader } from "./loader"
+import { PageHeader } from "@/components/ui/PageHeader"
+import { Suspense } from "react"
+import { Button } from "@/components/ui/button"
+import { Link } from "react-router-dom"
 
-export function JobListingOrderCompletePage() {
-  const data = useDeferredLoaderData<typeof loader>()
+export function OrderCompletePage() {
+  const { messagePromise } = useDeferredLoaderData<typeof loader>()
 
   return (
     <div className="flex flex-col items-center">
       <PageHeader
         subtitle={
           <Suspense fallback="Your payment is processing">
-            <Await resolve={data.message}>{message => message}</Await>
+            <Await resolve={messagePromise}>{message => message}</Await>
           </Suspense>
         }
       >
@@ -25,5 +25,3 @@ export function JobListingOrderCompletePage() {
     </div>
   )
 }
-
-// TODO: Include docs on how to use webhook with cli

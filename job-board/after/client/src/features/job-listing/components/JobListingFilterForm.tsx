@@ -18,8 +18,8 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import {
-  JOB_LISTING_TYPES,
   JOB_LISTING_EXPERIENCE_LEVELS,
+  JOB_LISTING_TYPES,
 } from "@backend/constants/types"
 import {
   Control,
@@ -30,121 +30,125 @@ import {
 } from "react-hook-form"
 import { JobListingFormValues } from "../hooks/useJobListingFilterForm"
 
-type FilterFormProps = {
+type JobListingFilterFormProps = {
+  className?: string
   form: UseFormReturn<JobListingFormValues>
 }
 
-export function JobListingFilterForm({ form }: FilterFormProps) {
+export function JobListingFilterForm({
+  className,
+  form,
+}: JobListingFilterFormProps) {
   return (
     <Form {...form}>
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-        <FormField
-          control={form.control}
-          name="title"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Title</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="location"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Location</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="minimumSalary"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Minimum Salary</FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  {...field}
-                  min={0}
-                  value={isNaN(field.value) ? "" : field.value}
-                  onChange={e => field.onChange(e.target.valueAsNumber)}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <JobListingSelectFormField
-          control={form.control}
-          label="Job Type"
-          name="type"
-          options={JOB_LISTING_TYPES}
-        />
-        <JobListingSelectFormField
-          control={form.control}
-          label="Experience Level"
-          name="experienceLevel"
-          options={JOB_LISTING_EXPERIENCE_LEVELS}
-        />
-        <div className="flex items-end justify-between gap-4">
-          <div className="flex flex-col justify-end gap-4">
-            <FormField
-              control={form.control}
-              name="showHidden"
-              render={({ field }) => (
-                <FormItem className="flex gap-3 space-y-0">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={checked =>
-                        field.onChange(
-                          checked === "indeterminate" ? false : checked
-                        )
-                      }
-                    />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
+      <form className={className} onSubmit={e => e.preventDefault()}>
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+          <FormField
+            control={form.control}
+            name="title"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Title</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="location"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Location</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="minimumSalary"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Minimum Salary</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    min={0}
+                    {...field}
+                    value={isNaN(field.value) ? "" : field.value}
+                    onChange={e => field.onChange(e.target.valueAsNumber)}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <JobListingSelectFormField
+            control={form.control}
+            label="Job Type"
+            name="type"
+            options={JOB_LISTING_TYPES}
+          />
+          <JobListingSelectFormField
+            control={form.control}
+            label="Experience Level"
+            name="experienceLevel"
+            options={JOB_LISTING_EXPERIENCE_LEVELS}
+          />
+          <div className="flex items-end justify-between gap-4">
+            <div className="flex flex-col justify-end gap-4">
+              <FormField
+                control={form.control}
+                name="showHidden"
+                render={({ field }) => (
+                  <FormItem className="flex gap-3 space-y-0">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={checked => {
+                          field.onChange(
+                            checked === "indeterminate" ? false : checked
+                          )
+                        }}
+                      />
+                    </FormControl>
                     <FormLabel>Show Hidden</FormLabel>
-                  </div>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="onlyShowFavorites"
-              render={({ field }) => (
-                <FormItem className="flex space-x-3 space-y-0">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={checked =>
-                        field.onChange(
-                          checked === "indeterminate" ? false : checked
-                        )
-                      }
-                    />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="onlyShowFavorites"
+                render={({ field }) => (
+                  <FormItem className="flex gap-3 space-y-0">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={checked => {
+                          field.onChange(
+                            checked === "indeterminate" ? false : checked
+                          )
+                        }}
+                      />
+                    </FormControl>
                     <FormLabel>Only Show Favorites</FormLabel>
-                  </div>
-                </FormItem>
-              )}
-            />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <Button type="button" onClick={() => form.reset()}>
+              Reset
+            </Button>
           </div>
-          <Button type="button" onClick={() => form.reset()}>
-            Reset
-          </Button>
         </div>
-      </div>
+      </form>
     </Form>
   )
 }
@@ -171,7 +175,7 @@ function JobListingSelectFormField<T extends FieldValues>({
           <FormLabel>{label}</FormLabel>
           <Select
             onValueChange={val => field.onChange(val as PathValue<T, Path<T>>)}
-            defaultValue={field.value}
+            value={field.value}
           >
             <FormControl>
               <SelectTrigger>

@@ -5,34 +5,28 @@ import {
   DropdownMenuItem,
   DropdownMenuPortal,
   DropdownMenuSeparator,
+  DropdownMenuSub,
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
-  DropdownMenuSub,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { THEME_OPTIONS } from "@/constants/constants"
 import { useAuth } from "@/features/authentication"
 import { useTheme } from "@/hooks/useTheme"
 import { ChevronDown, Menu, Moon, Sun } from "lucide-react"
-import { Link, NavLink } from "react-router-dom"
-
-const LINKS = [
-  { to: "/tasks", label: "Task Board" },
-  { to: "/jobs", label: "Job Listings" },
-]
+import { Link } from "react-router-dom"
 
 export function Navbar() {
   const { user, logout } = useAuth()
-
   return (
-    <nav className="sticky top-0 z-10 bg-white dark:bg-slate-950 border-b p-4">
+    <nav className="sticky top-0 z-10 border-b p-4 bg-white dark:bg-slate-950">
       <div className="container flex items-center justify-between gap-4">
         <span className="text-lg">WDS App</span>
         <div className="flex">
           <ThemeToggleButton />
           <div className="hidden sm:flex">
-            {LINKS.map(link => (
-              <NavItem key={link.to} {...link} />
-            ))}
+            <NavItem to="/tasks" label="Task Board" />
+            <NavItem to="/jobs" label="Job Listings" />
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -45,7 +39,11 @@ export function Navbar() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                  <LoginMenuItems logout={logout} />
+                  <DropdownMenuItem asChild>
+                    <Link to="/jobs/my-listings">My Listings</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={logout}>Logout</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
@@ -53,20 +51,22 @@ export function Navbar() {
             )}
           </div>
           <DropdownMenu>
-            <DropdownMenuTrigger asChild className="block sm:hidden">
+            <DropdownMenuTrigger asChild className="flex sm:hidden">
               <Button
                 variant="ghost"
+                size="icon"
                 className="data-[state=open]:bg-slate-100 dark:data-[state=open]:bg-slate-800"
               >
-                <Menu className="w-4 h-4" />
+                <Menu className="w-5 h-5" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              {LINKS.map(link => (
-                <DropdownMenuItem key={link.to} asChild>
-                  <NavLink to={link.to}>{link.label}</NavLink>
-                </DropdownMenuItem>
-              ))}
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem asChild>
+                <Link to="/tasks">Task Board</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/jobs">Job Listings</Link>
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               {user ? (
                 <DropdownMenuSub>
@@ -76,13 +76,19 @@ export function Navbar() {
                   </DropdownMenuSubTrigger>
                   <DropdownMenuPortal>
                     <DropdownMenuSubContent>
-                      <LoginMenuItems logout={logout} />
+                      <DropdownMenuItem asChild>
+                        <Link to="/jobs/my-listings">My Listings</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={logout}>
+                        Logout
+                      </DropdownMenuItem>
                     </DropdownMenuSubContent>
                   </DropdownMenuPortal>
                 </DropdownMenuSub>
               ) : (
                 <DropdownMenuItem asChild>
-                  <NavLink to="/login">Login</NavLink>
+                  <Link to="/login">Login</Link>
                 </DropdownMenuItem>
               )}
             </DropdownMenuContent>
@@ -93,22 +99,6 @@ export function Navbar() {
   )
 }
 
-type LoginMenuItemsProps = {
-  logout: () => void
-}
-
-function LoginMenuItems({ logout }: LoginMenuItemsProps) {
-  return (
-    <>
-      <DropdownMenuItem asChild>
-        <Link to="/jobs/my-listings">My Listings</Link>
-      </DropdownMenuItem>
-      <DropdownMenuSeparator />
-      <DropdownMenuItem onClick={logout}>Logout</DropdownMenuItem>
-    </>
-  )
-}
-
 type NavItemProps = {
   to: string
   label: string
@@ -116,17 +106,14 @@ type NavItemProps = {
 
 function NavItem({ to, label }: NavItemProps) {
   return (
-    <div className="h-full flex">
-      <Button asChild variant="ghost">
-        <NavLink to={to}>{label}</NavLink>
-      </Button>
-    </div>
+    <Button asChild variant="ghost">
+      <Link to={to}>{label}</Link>
+    </Button>
   )
 }
 
 function ThemeToggleButton() {
   const { setTheme } = useTheme()
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -135,21 +122,21 @@ function ThemeToggleButton() {
           size="icon"
           className="data-[state=open]:bg-slate-100 dark:data-[state=open]:bg-slate-800"
         >
-          <Sun className="h-5 w-5 scale-100 transition-transform dark:scale-0" />
-          <Moon className="absolute h-5 w-5 scale-0 transition-transform dark:scale-100" />
-          <span className="sr-only">Toggle theme</span>
+          <Sun className="h-5 w-5 scale-100 dark:scale-0 transition-transform" />
+          <Moon className="absolute h-5 w-5 scale-0 dark:scale-100 transition-transform" />
+          <span className="sr-only">Toggle Theme</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setTheme("light")}>
-          Light
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("dark")}>
-          Dark
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("system")}>
-          System
-        </DropdownMenuItem>
+        {THEME_OPTIONS.map(theme => (
+          <DropdownMenuItem
+            className="capitalize"
+            key={theme}
+            onClick={() => setTheme(theme)}
+          >
+            {theme}
+          </DropdownMenuItem>
+        ))}
       </DropdownMenuContent>
     </DropdownMenu>
   )

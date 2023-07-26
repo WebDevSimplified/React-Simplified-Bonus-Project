@@ -1,52 +1,62 @@
 import { PageHeader } from "@/components/ui/PageHeader"
 import { Button } from "@/components/ui/button"
-import { ToastAction } from "@/components/ui/toast"
-import { toast } from "@/components/ui/use-toast"
-import {
-  JobListingFilterForm,
-  JobListingGrid,
-  useJobListingFilterForm,
-  JobListingCard,
-  JobListingFullDialog,
-  JobListingSkeletonGrid,
-} from "@/features/job-listing"
-import { useLocalStorage } from "@/hooks/useLocalStorage"
 import { Await, useDeferredLoaderData } from "@/lib/reactRouter"
-import { cn } from "@/utils/shadcnUtils"
-import { Eye, EyeOff, Heart } from "lucide-react"
 import { Suspense } from "react"
 import { Link } from "react-router-dom"
 import { loader } from "./loader"
+import {
+  JobListingFullDialog,
+  JobListingFilterForm,
+  JobListingGrid,
+  JobListingCard,
+  JobListingSkeletonGrid,
+  useJobListingFilterForm,
+} from "@/features/job-listing"
+import { Eye, EyeOff, Heart } from "lucide-react"
+import { useLocalStorage } from "@/hooks/useLocalStorage"
+import { cn } from "@/utils/shadcnUtils"
+import { toast } from "@/components/ui/use-toast"
+import { ToastAction } from "@/components/ui/toast"
 
 export function JobListingsListPage() {
-  const data = useDeferredLoaderData<typeof loader>()
-  const { form, getFilteredJobs } = useJobListingFilterForm()
+  const { jobListingsPromise } = useDeferredLoaderData<typeof loader>()
   const [hiddenJobListingIds, setHiddenJobListingIds] = useLocalStorage<
     string[]
-  >("hiddenJobIds", [])
+  >("hiddenJobsIds", [])
   const [favoriteJobListingIds, setFavoriteJobListingIds] = useLocalStorage<
     string[]
-  >("favoriteJobIds", [])
+  >("favoriteJobsIds", [])
+  const { form, getFilteredJobs } = useJobListingFilterForm()
 
-  function onHide(id: string, title: string) {
-    const hideJob = (id: string, isHidden: boolean) => {
-      if (isHidden) {
-        setHiddenJobListingIds(ids => [...ids, id])
-      } else {
-        setHiddenJobListingIds(ids => ids.filter(jobId => jobId !== id))
+  function toggleFavorite(jobListingId: string) {
+    setFavoriteJobListingIds(ids => {
+      if (ids.includes(jobListingId)) {
+        return ids.filter(id => id !== jobListingId)
       }
-    }
 
-    const shouldHide = !hiddenJobListingIds.includes(id)
-    hideJob(id, shouldHide)
+      return [...ids, jobListingId]
+    })
+  }
 
-    if (!shouldHide) return
+  function toggleHide(jobListingId: string, title: string) {
+    setHiddenJobListingIds(ids => {
+      if (ids.includes(jobListingId)) {
+        return ids.filter(id => id !== jobListingId)
+      }
+
+      return [...ids, jobListingId]
+    })
+
+    if (hiddenJobListingIds.includes(jobListingId)) return
+
     toast({
       title: "Job Hidden",
       description: `${title} will no longer be shown`,
       action: (
         <ToastAction
-          onClick={() => hideJob(id, false)}
+          onClick={() => {
+            setHiddenJobListingIds(ids => ids.filter(id => id !== jobListingId))
+          }}
           altText="Click show hidden in the filter section to show hidden jobs and then click the show button in the card to show this job again"
         >
           Undo
@@ -55,31 +65,20 @@ export function JobListingsListPage() {
     })
   }
 
-  function toggleFavorite(jobListingId: string) {
-    setFavoriteJobListingIds(ids => {
-      if (ids.includes(jobListingId)) {
-        return ids.filter(id => jobListingId !== id)
-      }
-      return [...ids, jobListingId]
-    })
-  }
-
   return (
     <>
       <PageHeader
         btnSection={
           <Button variant="outline" asChild>
-            <Link to="new" className="flex gap-1">
-              Create Listing
-            </Link>
+            <Link to="/jobs/new">Create Listing</Link>
           </Button>
         }
       >
         Job Listings
       </PageHeader>
-      <JobListingFilterForm form={form} />
+      <JobListingFilterForm className="mb-12" form={form} />
       <Suspense fallback={<JobListingSkeletonGrid />}>
-        <Await resolve={data.jobListings}>
+        <Await resolve={jobListingsPromise}>
           {jobListings => (
             <JobListingGrid>
               {getFilteredJobs(
@@ -87,21 +86,24 @@ export function JobListingsListPage() {
                 hiddenJobListingIds,
                 favoriteJobListingIds
               ).map(jobListing => {
+                const isFavorite = favoriteJobListingIds.includes(jobListing.id)
                 const isHidden = hiddenJobListingIds.includes(jobListing.id)
                 const HideIcon = isHidden ? Eye : EyeOff
 
                 return (
                   <JobListingCard
-                    className={isHidden ? "opacity-50" : undefined}
                     key={jobListing.id}
+                    className={isHidden ? "opacity-50" : undefined}
+                    {...jobListing}
+                    footerBtns={<JobListingFullDialog {...jobListing} />}
                     headerDetails={
                       <div className="-mr-3 -mt-3">
                         <Button
                           size="icon"
-                          className="rounded-full"
                           variant="ghost"
+                          className="rounded-full"
                           onClick={() =>
-                            onHide(jobListing.id, jobListing.title)
+                            toggleHide(jobListing.id, jobListing.title)
                           }
                         >
                           <HideIcon className="w-4 h-4" />
@@ -110,23 +112,23 @@ export function JobListingsListPage() {
                           </div>
                         </Button>
                         <Button
-                          onClick={() => toggleFavorite(jobListing.id)}
                           size="icon"
-                          className="rounded-full"
                           variant="ghost"
+                          className="rounded-full"
+                          onClick={() => toggleFavorite(jobListing.id)}
                         >
                           <Heart
                             className={cn(
                               "w-4 h-4",
-                              favoriteJobListingIds.includes(jobListing.id) &&
-                                "fill-red-500 stroke-red-500"
+                              isFavorite && "fill-red-500 stroke-red-500"
                             )}
                           />
+                          <div className="sr-only">
+                            {isFavorite ? "Un-Favorite" : "Favorite"}
+                          </div>
                         </Button>
                       </div>
                     }
-                    footerBtns={<JobListingFullDialog {...jobListing} />}
-                    {...jobListing}
                   />
                 )
               })}

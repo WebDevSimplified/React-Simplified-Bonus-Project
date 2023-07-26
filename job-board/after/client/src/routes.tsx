@@ -4,13 +4,12 @@ import { ErrorPage } from "@/pages/ErrorPage"
 import { TaskListPage } from "@/pages/tasks/TaskListPage"
 import { NewTaskPage } from "@/pages/tasks/NewTaskPage"
 import { NotFoundPage } from "@/pages/NotFoundPage"
-import { jobListingRoute } from "@/pages/job-listings/index"
-import { NewJobListingPage } from "@/pages/job-listings/NewJobListingPage"
-import { PrivatePage } from "@/components/routing/PrivatePage"
-import { AuthLayout, LoginForm, SignupForm } from "./features/authentication"
-import { myJobListingsRoute } from "./pages/job-listings/my-listings"
-import { jobListingOrderCompleteRoute } from "./pages/job-listings/order-complete"
-import { editJobListingRoute } from "./pages/job-listings/edit"
+import { AuthLayout, LoginForm, SignupForm } from "@/features/authentication"
+import { myJobListingsRoute } from "./pages/jobs/my-listings"
+import { NewJobListingPage } from "./pages/jobs/NewJobListingPage"
+import { editJobListingRoute } from "./pages/jobs/edit"
+import { orderCompleteRoute } from "./pages/jobs/order-complete"
+import { jobListingsIndexRoute } from "./pages/jobs/index"
 
 export const routes: RouteObject[] = [
   {
@@ -22,7 +21,7 @@ export const routes: RouteObject[] = [
         children: [
           {
             index: true,
-            element: <Navigate to="/jobs" />,
+            element: <Navigate to="/tasks" replace />,
           },
           {
             path: "tasks",
@@ -34,30 +33,13 @@ export const routes: RouteObject[] = [
           {
             path: "jobs",
             children: [
-              { index: true, ...jobListingRoute },
-              {
-                path: "new",
-                element: (
-                  <PrivatePage>
-                    <NewJobListingPage />
-                  </PrivatePage>
-                ),
-              },
-              {
-                path: "my-listings",
-                ...myJobListingsRoute,
-              },
-              {
-                path: "order-complete",
-                ...jobListingOrderCompleteRoute,
-              },
-              {
-                path: ":id/edit",
-                ...editJobListingRoute,
-              },
+              { index: true, ...jobListingsIndexRoute },
+              { path: "my-listings", ...myJobListingsRoute },
+              { path: "new", element: <NewJobListingPage /> },
+              { path: ":id/edit", ...editJobListingRoute },
+              { path: "order-complete", ...orderCompleteRoute },
             ],
           },
-          { path: "*", element: <NotFoundPage /> },
           {
             element: <AuthLayout />,
             children: [
@@ -65,6 +47,7 @@ export const routes: RouteObject[] = [
               { path: "signup", element: <SignupForm /> },
             ],
           },
+          { path: "*", element: <NotFoundPage /> },
         ],
       },
     ],

@@ -1,3 +1,5 @@
+import { MarkdownRenderer } from "@/components/ui/MarkdownRenderer"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -11,23 +13,21 @@ import { formatCurrency } from "@/utils/formatters"
 import {
   Banknote,
   CalendarDays,
-  GraduationCap,
   ExternalLink,
+  GraduationCap,
 } from "lucide-react"
-import { JobListing } from ".."
-import { Badge } from "@/components/ui/badge"
-import { MarkdownRenderer } from "@/components/ui/MarkdownRenderer"
+import { JobListing } from "../constants/types"
 
 type JobListingFullDialogProps = Pick<
   JobListing,
-  | "title"
-  | "companyName"
   | "applyUrl"
+  | "companyName"
   | "description"
   | "experienceLevel"
   | "location"
   | "salary"
   | "type"
+  | "title"
 >
 
 export function JobListingFullDialog({
@@ -45,24 +45,20 @@ export function JobListingFullDialog({
       <DialogTrigger asChild>
         <Button>View More</Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[calc(100vh-2rem)] flex flex-col max-w-3xl w-[calc(100vw-2rem)] rounded">
+      <DialogContent className="max-h-[calc(100vh-2rem)] flex flex-col max-w-3xl w-[calc(100vw-2rem)]">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription className="flex flex-col">
-            <span>{companyName}</span>
-            <span>{location}</span>
+            <div>{companyName}</div>
+            <div>{location}</div>
           </DialogDescription>
-
           <div className="flex gap-1 flex-wrap">
-            {/* Salary */}
             <Badge variant="secondary" className="flex gap-1 whitespace-nowrap">
               <Banknote className="w-4 h-4" /> {formatCurrency(salary)}
             </Badge>
-
             <Badge variant="secondary" className="flex gap-1 whitespace-nowrap">
               <CalendarDays className="w-4 h-4" /> {jobType}
             </Badge>
-
             <Badge variant="secondary" className="flex gap-1 whitespace-nowrap">
               <GraduationCap className="w-4 h-4" /> {experienceLevel}
             </Badge>
@@ -70,7 +66,7 @@ export function JobListingFullDialog({
         </DialogHeader>
         <div>
           <Button asChild>
-            <a target="_blank" href={applyUrl}>
+            <a href={applyUrl} target="_blank">
               Apply On Company Site
               <ExternalLink className="w-4 h-4 ml-2" />
             </a>

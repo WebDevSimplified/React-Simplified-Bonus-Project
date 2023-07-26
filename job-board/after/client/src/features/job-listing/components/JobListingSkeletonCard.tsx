@@ -11,24 +11,23 @@ export function JobListingSkeletonCard() {
         <Skeleton className="h-6 w-48" />
         <Skeleton className="h-4 w-12" />
         <Skeleton className="h-4 w-20" />
+
         <div className="flex gap-1 flex-wrap">
           <Badge variant="secondary" className="animate-pulse">
             <Banknote className="w-4 h-4" />
             <div className="w-8" />
           </Badge>
-
           <Badge variant="secondary" className="animate-pulse">
             <CalendarDays className="w-4 h-4" />
             <div className="w-8" />
           </Badge>
-
           <Badge variant="secondary" className="animate-pulse">
             <GraduationCap className="w-4 h-4" />
             <div className="w-8" />
           </Badge>
         </div>
       </CardHeader>
-      <CardContent className="flex gap-1 flex-col">
+      <CardContent className="gap-1 flex-col flex">
         <Skeleton className="h-4" />
         <Skeleton className="h-4" />
         <Skeleton className="h-4" />

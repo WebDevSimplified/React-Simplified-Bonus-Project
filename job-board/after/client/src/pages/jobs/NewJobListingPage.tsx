@@ -8,8 +8,8 @@ export function NewJobListingPage() {
     <>
       <PageHeader>New Listing</PageHeader>
       <JobListingForm
-        onSubmit={async data => {
-          await createJobListing(data)
+        onSubmit={async values => {
+          await createJobListing(values)
           navigate("/jobs/my-listings")
         }}
       />
