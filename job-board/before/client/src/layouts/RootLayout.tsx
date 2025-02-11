@@ -1,5 +1,5 @@
 import { Toaster } from "@/components/ui/toaster"
-import { Outlet, ScrollRestoration } from "react-router-dom"
+import { Outlet, ScrollRestoration } from "react-router"
 
 export function RootLayout() {
   return (

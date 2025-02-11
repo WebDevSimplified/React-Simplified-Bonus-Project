@@ -1,6 +1,5 @@
 import { getAllMyListings } from "@/features/job-listing"
-import { deferredLoader } from "@/lib/reactRouter"
 
-export const loader = deferredLoader(() => {
+export function loader() {
   return { jobListingsPromise: getAllMyListings() }
-})
+}

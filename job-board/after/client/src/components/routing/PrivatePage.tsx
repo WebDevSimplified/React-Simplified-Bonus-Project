@@ -1,6 +1,6 @@
 import { useAuth } from "@/features/authentication"
 import { LoadingSpinner } from "../ui/LoadingSpinner"
-import { Navigate, useLocation } from "react-router-dom"
+import { Navigate, useLocation } from "react-router"
 import { ReactNode } from "react"
 
 export function PrivatePage({ children }: { children: ReactNode }) {

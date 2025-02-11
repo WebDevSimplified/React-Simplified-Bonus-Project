@@ -2,7 +2,7 @@ import { PageHeader } from "@/components/ui/PageHeader"
 import { Button } from "@/components/ui/button"
 import { TaskTable } from "@/features/task-list"
 import { Plus } from "lucide-react"
-import { Link } from "react-router-dom"
+import { Link } from "react-router"
 
 export function TaskListPage() {
   return (

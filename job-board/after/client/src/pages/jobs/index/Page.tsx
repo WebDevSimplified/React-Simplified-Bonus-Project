@@ -1,8 +1,7 @@
 import { PageHeader } from "@/components/ui/PageHeader"
 import { Button } from "@/components/ui/button"
-import { Await, useDeferredLoaderData } from "@/lib/reactRouter"
 import { Suspense } from "react"
-import { Link } from "react-router-dom"
+import { Await, Link, useLoaderData } from "react-router"
 import { loader } from "./loader"
 import {
   JobListingFullDialog,
@@ -19,7 +18,7 @@ import { toast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
 
 export function JobListingsListPage() {
-  const { jobListingsPromise } = useDeferredLoaderData<typeof loader>()
+  const { jobListingsPromise } = useLoaderData<typeof loader>()
   const [hiddenJobListingIds, setHiddenJobListingIds] = useLocalStorage<
     string[]
   >("hiddenJobsIds", [])

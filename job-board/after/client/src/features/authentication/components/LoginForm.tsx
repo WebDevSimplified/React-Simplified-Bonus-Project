@@ -20,7 +20,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Link } from "react-router-dom"
+import { Link } from "react-router"
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner"
 import { AxiosError } from "axios"
 import { useAuth } from "../hooks/useAuth"

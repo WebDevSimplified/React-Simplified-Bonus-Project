@@ -1,7 +1,7 @@
-import { deferredLoader } from "@/lib/reactRouter"
 import { stripePromise } from "@/lib/stripe"
+import { LoaderFunctionArgs } from "react-router"
 
-export const loader = deferredLoader(({ request: { url } }) => {
+export function loader({ request: { url } }: LoaderFunctionArgs) {
   const searchParams = new URL(url).searchParams
   const clientSecret = searchParams.get("payment_intent_client_secret")
 
@@ -27,4 +27,4 @@ export const loader = deferredLoader(({ request: { url } }) => {
         })
     }),
   }
-})
+}
