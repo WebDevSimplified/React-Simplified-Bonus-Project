@@ -1,4 +1,4 @@
-import { Navigate, RouteObject } from "react-router-dom"
+import { Navigate, RouteObject } from "react-router"
 import { RootLayout } from "@/layouts/RootLayout"
 import { ErrorPage } from "@/pages/ErrorPage"
 import { TaskListPage } from "@/pages/tasks/TaskListPage"

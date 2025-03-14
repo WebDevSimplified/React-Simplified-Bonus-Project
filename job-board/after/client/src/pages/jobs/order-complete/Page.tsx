@@ -1,12 +1,11 @@
-import { Await, useDeferredLoaderData } from "@/lib/reactRouter"
 import { loader } from "./loader"
 import { PageHeader } from "@/components/ui/PageHeader"
 import { Suspense } from "react"
 import { Button } from "@/components/ui/button"
-import { Link } from "react-router-dom"
+import { Await, Link, useLoaderData } from "react-router"
 
 export function OrderCompletePage() {
-  const { messagePromise } = useDeferredLoaderData<typeof loader>()
+  const { messagePromise } = useLoaderData<typeof loader>()
 
   return (
     <div className="flex flex-col items-center">

@@ -14,7 +14,7 @@ import { THEME_OPTIONS } from "@/constants/constants"
 import { useAuth } from "@/features/authentication"
 import { useTheme } from "@/hooks/useTheme"
 import { ChevronDown, Menu, Moon, Sun } from "lucide-react"
-import { Link } from "react-router-dom"
+import { Link } from "react-router"
 
 export function Navbar() {
   const { user, logout } = useAuth()

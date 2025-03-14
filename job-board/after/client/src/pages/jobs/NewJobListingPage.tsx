@@ -1,6 +1,6 @@
 import { PageHeader } from "@/components/ui/PageHeader"
 import { JobListingForm, createJobListing } from "@/features/job-listing"
-import { useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router"
 
 export function NewJobListingPage() {
   const navigate = useNavigate()

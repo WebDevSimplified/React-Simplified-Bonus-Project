@@ -1,6 +1,6 @@
 import { PageHeader } from "@/components/ui/PageHeader"
 import { TaskForm, addTask } from "@/features/task-list"
-import { useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router"
 
 export function NewTaskPage() {
   const navigate = useNavigate()

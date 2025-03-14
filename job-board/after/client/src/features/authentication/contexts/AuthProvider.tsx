@@ -6,7 +6,7 @@ import {
   logout as logoutService,
   getLoggedInUser,
 } from "../services/authentication"
-import { useLocation, useNavigate } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router"
 import { LogoutDialog } from "../components/LogoutDialog"
 
 type AuthProviderProps = {

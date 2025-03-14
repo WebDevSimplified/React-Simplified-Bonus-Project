@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom"
+import { Link } from "react-router"
 import { JobListing } from "../constants/types"
 import { JobListingCard } from "./JobListingCard"
 import { JobListingGrid } from "./JobListingGrid"

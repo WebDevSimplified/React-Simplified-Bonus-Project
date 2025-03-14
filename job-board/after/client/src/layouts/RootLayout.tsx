@@ -1,5 +1,5 @@
 import { Toaster } from "@/components/ui/toaster"
-import { Outlet, ScrollRestoration } from "react-router-dom"
+import { Outlet, ScrollRestoration } from "react-router"
 import { Navbar } from "./Navbar"
 import { ThemeProvider } from "@/contexts/ThemeProvider"
 import { AuthProvider } from "@/features/authentication"
